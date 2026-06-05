@@ -41,7 +41,7 @@ class App(ctk.CTk):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT,
             quantidade INTEGER,
-            usuario_id INTEGER
+            usuario_id INTEGER NULL 
         )
         """)
 
@@ -216,10 +216,7 @@ class App(ctk.CTk):
 
             gestor_de_estoque.usuario_id = usuario[0]
 
-            messagebox.showinfo(
-                "Sucesso",
-                "Login realizado!"
-            )
+            
 
             gestor_de_estoque.tela_estoque()
 
@@ -342,7 +339,7 @@ class App(ctk.CTk):
             frame_botoes,
             text="Logout",
             command=gestor_de_estoque.logout
-        ).pack(side="right", padx=5)
+        ).pack(side="top", padx=5, pady=5)
 
         gestor_de_estoque.carregar_itens()
 
@@ -356,9 +353,7 @@ class App(ctk.CTk):
             """
             SELECT id,nome,quantidade
             FROM itens
-            WHERE usuario_id=?
-            """,
-            (gestor_de_estoque.usuario_id,)
+            """
         )
 
         itens = gestor_de_estoque.cursor.fetchall()
