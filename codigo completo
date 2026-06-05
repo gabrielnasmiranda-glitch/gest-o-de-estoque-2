@@ -2,10 +2,6 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 import sqlite3
 
-# =========================
-# CONFIGURAÇÕES DA JANELA
-# =========================
-
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -26,9 +22,6 @@ class App(ctk.CTk):
 
         gestor_de_estoque.tela_inicial()
 
-    # =========================
-    # BANCO DE DADOS
-    # =========================
 
     def criar_banco(gestor_de_estoque):
 
@@ -54,18 +47,12 @@ class App(ctk.CTk):
 
         gestor_de_estoque.conexao.commit()
 
-    # =========================
-    # LIMPAR TELA
-    # =========================
 
     def limpar_tela(gestor_de_estoque):
 
         if gestor_de_estoque.frame_atual:
             gestor_de_estoque.frame_atual.destroy()
 
-    # =========================
-    # TELA INICIAL
-    # =========================
 
     def tela_inicial(gestor_de_estoque):
 
@@ -96,10 +83,6 @@ class App(ctk.CTk):
             command=gestor_de_estoque.tela_cadastro
         )
         btn_cadastro.pack(pady=20)
-
-    # =========================
-    # TELA CADASTRO
-    # =========================
 
     def tela_cadastro(gestor_de_estoque):
 
@@ -141,9 +124,6 @@ class App(ctk.CTk):
             command=gestor_de_estoque.tela_inicial
         ).pack(pady=20)
 
-    # =========================
-    # CADASTRAR USUÁRIO
-    # =========================
 
     def cadastrar_usuario(gestor_de_estoque):
 
@@ -179,10 +159,6 @@ class App(ctk.CTk):
                 "Erro",
                 "Usuário já existe."
             )
-
-    # =========================
-    # TELA LOGIN
-    # =========================
 
     def tela_login(gestor_de_estoque):
 
@@ -224,10 +200,6 @@ class App(ctk.CTk):
             command=gestor_de_estoque.tela_inicial
         ).pack(pady=20)
 
-    # =========================
-    # LOGIN
-    # =========================
-
     def fazer_login(gestor_de_estoque):
 
         nome = gestor_de_estoque.nome_login.get()
@@ -257,10 +229,6 @@ class App(ctk.CTk):
                 "Erro",
                 "Usuário ou senha incorretos."
             )
-
-    # =========================
-    # TELA ESTOQUE
-    # =========================
 
     def tela_estoque(gestor_de_estoque):
 
@@ -378,9 +346,6 @@ class App(ctk.CTk):
 
         gestor_de_estoque.carregar_itens()
 
-    # =========================
-    # CARREGAR ITENS
-    # =========================
 
     def carregar_itens(gestor_de_estoque):
 
@@ -406,9 +371,6 @@ class App(ctk.CTk):
                 values=item
             )
 
-    # =========================
-    # ADICIONAR PRODUTO
-    # =========================
 
     def adicionar_produto(gestor_de_estoque):
 
@@ -452,10 +414,6 @@ class App(ctk.CTk):
         gestor_de_estoque.entry_quantidade.delete(0, "end")
 
         gestor_de_estoque.carregar_itens()
-
-    # =========================
-    # RETIRAR QUANTIDADE
-    # =========================
 
     def retirar_quantidade(gestor_de_estoque):
 
@@ -530,10 +488,6 @@ class App(ctk.CTk):
             )
 
         gestor_de_estoque.carregar_itens()
-
-    # =========================
-    # REMOVER PRODUTO
-    # =========================
 
     def remover_produto(gestor_de_estoque):
 
@@ -652,9 +606,7 @@ class App(ctk.CTk):
             )
 
         gestor_de_estoque.carregar_itens()
-    # =========================
-    # EXCLUIR CONTA
-    # =========================
+    
 
     def excluir_conta(gestor_de_estoque):
 
@@ -693,20 +645,13 @@ class App(ctk.CTk):
 
         gestor_de_estoque.tela_inicial()
 
-    # =========================
-    # LOGOUT
-    # =========================
-
     def logout(gestor_de_estoque):
 
         gestor_de_estoque.usuario_id = None
 
         gestor_de_estoque.tela_inicial()
 
-    # =========================
-    # FECHAR PROGRAMA
-    # =========================
-
+    
     def destroy(gestor_de_estoque):
 
         gestor_de_estoque.conexao.close()

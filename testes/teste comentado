@@ -1,0 +1,51 @@
+import customtkinter as ctk  # Importo a biblioteca customtkinter para criar uma interface gráfica moderna.
+from tkinter import ttk, messagebox  # Importo também elementos tradicionais do tkinter, como caixas de mensagem.
+import sqlite3  # Utilizo o sqlite3 para persistir os dados de forma simples em um arquivo local.
+
+ctk.set_appearance_mode("dark")  # Defino o modo escuro da interface, o que deixa a experiência mais agradável aos olhos.
+ctk.set_default_color_theme("blue")  # Defino o tema de cores como azul, garantindo um padrão visual.
+
+class App(ctk.CTk):  # Defino a classe principal da aplicação, que herda de CTk, um tipo de janela do customtkinter.
+    def __init__(gestor_de_estoque):  # O construtor da classe, inicializando a aplicação.
+        super().__init__()  # Chamo o construtor da superclasse para garantir que a janela será configurada.
+
+        gestor_de_estoque.title("Gestor de Estoque")  # Defino o título da janela.
+        gestor_de_estoque.geometry("900x600")  # Defino o tamanho da janela, garantindo um espaço amplo para a interface.
+
+        gestor_de_estoque.usuario_id = None  # Inicializo o id do usuário como None, ou seja, nenhum usuário logado.
+
+        gestor_de_estoque.criar_banco()  # Chamo o método para criar o banco de dados, que vai garantir as tabelas iniciais.
+
+        gestor_de_estoque.frame_atual = None  # Inicializo o frame atual como None; ele será usado para trocar entre as telas.
+
+        gestor_de_estoque.tela_inicial()  # Ao iniciar, mostro a tela inicial, com opções de login ou cadastro.
+
+    def criar_banco(gestor_de_estoque):  # Método responsável por criar o banco SQLite, se ele ainda não existir.
+        gestor_de_estoque.conexao = sqlite3.connect("estoque.db")  # Abro uma conexão com o banco de dados (arquivo local).
+        gestor_de_estoque.cursor = gestor_de_estoque.conexao.cursor()  # Crio um cursor para executar comandos SQL.
+
+        # Criação da tabela de usuários, se não existir.
+        gestor_de_estoque.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  # Cada usuário tem um id único autoincrementado.
+            nome TEXT UNIQUE,  # Nome do usuário deve ser único na tabela.
+            senha TEXT  # Armazeno a senha do usuário (em um cenário real, seria bom criptografar).
+        """)
+
+        # Criação da tabela de itens, que armazena os produtos do usuário.
+        gestor_de_estoque.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS itens(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  # Cada item tem um id único autoincrementado.
+            nome TEXT,  # Nome do produto.
+            quantidade INTEGER,  # Quantidade em estoque.
+            usuario_id INTEGER  # Identifica a qual usuário o item pertence.
+        """)
+
+        gestor_de_estoque.conexao.commit()  # Salvo as mudanças no banco.
+
+    def limpar_tela(gestor_de_estoque):  # Método para limpar o conteúdo da tela atual antes de trocar de tela.
+        if gestor_de_estoque.frame_atual:
+            gestor_de_estoque.frame_atual.destroy()  # Destruo o frame anterior para liberar espaço e evitar duplicidade.
+
+    def tela_inicial(gestor_de_estoque):  # Método que mostra a tela inicial, com opções de login e cadastro.
+        gestor_de_estoque.limpar_tela()  # Limpo a tela antes de carregar
