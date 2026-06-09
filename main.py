@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 
 conexao = sqlite3.connect("estoque.db")
 cursor = conexao.cursor()
@@ -37,10 +38,12 @@ while usuario_id is None:
         nome = input("Nome de usuário: ")
         senha = input("Senha: ")
 
+        senha_hash = bcrypt.hashpw(senha.encode("utf-8"),bcrypt.gensalt())
+
         try:
             cursor.execute(
                 "INSERT INTO usuarios (nome, senha) VALUES (?, ?)",
-                (nome, senha)
+                (nome, senha_hash)
             )
             conexao.commit()
 
@@ -55,15 +58,23 @@ while usuario_id is None:
         senha = input("Senha: ")
 
         cursor.execute(
-            "SELECT id FROM usuarios WHERE nome = ? AND senha = ?",
-            (nome, senha)
+            "SELECT id, senha FROM usuarios WHERE nome = ?",
+            (nome,)
         )
 
         usuario = cursor.fetchone()
 
         if usuario:
-            usuario_id = usuario[0]
-            print("Login realizado com sucesso!")
+
+            id_banco = usuario[0]
+            senha_hash = usuario[1]
+
+            if bcrypt.checkpw(senha.encode("utf-8"), senha_hash("utf-8")):
+                usuario_id = id_banco
+                print("Login realizado com sucesso!")
+            else:
+                print("Usuário ou senha incorretos.")
+
         else:
             print("Usuário ou senha incorretos.")
 
@@ -179,7 +190,10 @@ while True:
 
         resultado = cursor.fetchone()
 
-        if resultado and senha == resultado[0]:
+        if resultado and bcrypt.checkpw(
+            senha.encode("utf-8"),
+            resultado[0].encode("utf-8")
+        ):
 
             confirmacao = input(
                 'ATENÇÃO! Todos os seus itens serão apagados.\n'
