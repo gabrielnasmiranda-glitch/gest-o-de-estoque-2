@@ -1,3 +1,4 @@
+import bcrypt
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 import sqlite3
@@ -147,11 +148,13 @@ class App(ctk.CTk):
             return
 
         try:
+            senha_hash = bcrypt.hashpw(senha.encode("utf-8"),bcrypt.gensalt()  ).decode("utf-8")
 
             gestor_de_estoque.cursor.execute(
-                "INSERT INTO usuarios(nome, senha) VALUES(?, ?)",
-                (nome, senha)
-            )
+            "INSERT INTO usuarios(nome, senha) VALUES(?, ?)",
+            (nome, senha_hash)
+)
+            
 
             gestor_de_estoque.conexao.commit()
 
@@ -215,26 +218,36 @@ class App(ctk.CTk):
         senha = gestor_de_estoque.senha_login.get()
 
         gestor_de_estoque.cursor.execute(
-            "SELECT id FROM usuarios WHERE nome=? AND senha=?",
-            (nome, senha)
-        )
+    "SELECT id, senha FROM usuarios WHERE nome=?",
+    (nome,)
+)
 
         usuario = gestor_de_estoque.cursor.fetchone()
 
         if usuario:
 
-            gestor_de_estoque.usuario_id = usuario[0]
+            usuario_id = usuario[0]
+            senha_hash = usuario[1]
 
-            
+        if bcrypt.checkpw(
+        senha.encode("utf-8"),
+        senha_hash.encode("utf-8")
+    ):
 
-            gestor_de_estoque.tela_estoque()
+            gestor_de_estoque.usuario_id = usuario_id
+        gestor_de_estoque.tela_estoque()
 
-        else:
+    else:
 
-            messagebox.showerror(
-                "Erro",
-                "Usuário ou senha incorretos."
-            )
+    messagebox.showerror("Erro","Usuário ou senha incorretos.")
+
+    else:
+
+    messagebox.showerror("Erro","Usuário ou senha incorretos.")
+  
+    else:
+
+    messagebox.showerror("Erro","Usuário ou senha incorretos.")
 
     def tela_estoque(gestor_de_estoque):
 
@@ -835,5 +848,5 @@ class App(ctk.CTk):
 
         super().destroy()
 
-app = App()
+APP = App()
 app.mainloop()
