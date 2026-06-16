@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 import sqlite3
+import matplotlib.pyplot as plt
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -420,6 +421,13 @@ class App(ctk.CTk):
             text="Logout",
             command=gestor_de_estoque.logout
         ).pack(side="top", padx=5, pady=5)
+        btn_grafico = ctk.CTkButton(
+        gestor_de_estoque.frame_atual,
+        text="Gráfico",
+        command=gestor_de_estoque.mostrar_grafico_vendas
+        )
+
+        btn_grafico.pack(pady=10)
 
         gestor_de_estoque.carregar_itens()
         gestor_de_estoque.carregar_vendas()
@@ -834,6 +842,46 @@ class App(ctk.CTk):
         gestor_de_estoque.conexao.close()
 
         super().destroy()
+
+    def mostrar_grafico_vendas(gestor_de_estoque):
+
+        gestor_de_estoque.cursor.execute("""
+        SELECT
+            nome,
+            SUM(quantidade_vendida) AS total_vendido
+        FROM vendas
+        GROUP BY nome
+        ORDER BY total_vendido DESC
+        LIMIT 10
+        """)
+
+        dados = gestor_de_estoque.cursor.fetchall()
+
+        if not dados:
+            messagebox.showinfo(
+                "Relatório",
+                "Nenhuma venda registrada."
+            )
+            return
+
+        produtos = []
+        quantidades = []
+
+        for produto, quantidade in dados:
+            produtos.append(produto)
+            quantidades.append(quantidade)
+
+        plt.figure(figsize=(10, 5))
+        plt.bar(produtos, quantidades)
+
+        plt.title("Produtos Mais Vendidos")
+        plt.xlabel("Produto")
+        plt.ylabel("Quantidade Vendida")
+
+        plt.xticks(rotation=45)
+
+        plt.tight_layout()
+        plt.show()
 
 app = App()
 app.mainloop()
