@@ -2,6 +2,7 @@ import bcrypt
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 import sqlite3
+import matplotlib.pyplot as plt
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -221,7 +222,6 @@ class App(ctk.CTk):
     "SELECT id, senha FROM usuarios WHERE nome=?",
     (nome,)
 )
-
         usuario = gestor_de_estoque.cursor.fetchone()
 
         if usuario:
@@ -229,26 +229,19 @@ class App(ctk.CTk):
             usuario_id = usuario[0]
             senha_hash = usuario[1]
 
-        if bcrypt.checkpw(
-        senha.encode("utf-8"),
-        senha_hash.encode("utf-8")
-    ):
+            if bcrypt.checkpw(
+                senha.encode("utf-8"),
+                senha_hash.encode("utf-8")
+            ):
 
-            gestor_de_estoque.usuario_id = usuario_id
-        gestor_de_estoque.tela_estoque()
+                gestor_de_estoque.usuario_id = usuario_id
+                gestor_de_estoque.tela_estoque()
 
-    else:
+            else:
+                messagebox.showerror("Erro", "Usuário ou senha incorretos.")
 
-    messagebox.showerror("Erro","Usuário ou senha incorretos.")
-
-    else:
-
-    messagebox.showerror("Erro","Usuário ou senha incorretos.")
-  
-    else:
-
-    messagebox.showerror("Erro","Usuário ou senha incorretos.")
-
+        else:
+            messagebox.showerror("Erro", "Usuário ou senha incorretos.")
     def tela_estoque(gestor_de_estoque):
 
         gestor_de_estoque.limpar_tela()
@@ -433,6 +426,13 @@ class App(ctk.CTk):
             text="Logout",
             command=gestor_de_estoque.logout
         ).pack(side="top", padx=5, pady=5)
+        btn_grafico = ctk.CTkButton(
+        gestor_de_estoque.frame_atual,
+        text="Gráfico",
+        command=gestor_de_estoque.mostrar_grafico_vendas
+        )
+
+        btn_grafico.pack(pady=10)
 
         gestor_de_estoque.carregar_itens()
         gestor_de_estoque.carregar_vendas()
@@ -848,5 +848,46 @@ class App(ctk.CTk):
 
         super().destroy()
 
-APP = App()
+
+    def mostrar_grafico_vendas(gestor_de_estoque):
+
+        gestor_de_estoque.cursor.execute("""
+        SELECT
+            nome,
+            SUM(quantidade_vendida) AS total_vendido
+        FROM vendas
+        GROUP BY nome
+        ORDER BY total_vendido DESC
+        LIMIT 10
+        """)
+
+        dados = gestor_de_estoque.cursor.fetchall()
+
+        if not dados:
+            messagebox.showinfo(
+                "Relatório",
+                "Nenhuma venda registrada."
+            )
+            return
+
+        produtos = []
+        quantidades = []
+
+        for produto, quantidade in dados:
+            produtos.append(produto)
+            quantidades.append(quantidade)
+
+        plt.figure(figsize=(10, 5))
+        plt.bar(produtos, quantidades)
+
+        plt.title("Produtos Mais Vendidos")
+        plt.xlabel("Produto")
+        plt.ylabel("Quantidade Vendida")
+
+        plt.xticks(rotation=45)
+
+        plt.tight_layout()
+        plt.show()
+
+app = App()
 app.mainloop()
