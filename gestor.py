@@ -105,14 +105,14 @@ class App(ctk.CTk):
 
         ctk.CTkLabel(
             gestor_de_estoque.frame_atual,
-            text="CADASTRAR USUÁRIO",
+            text="CADASTRAR USUARIO",
             font=("Arial", 25, "bold")
         ).pack(pady=30)
 
         gestor_de_estoque.nome_cadastro = ctk.CTkEntry(
             gestor_de_estoque.frame_atual,
             width=300,
-            placeholder_text="Usuário"
+            placeholder_text="Email"
         )
         gestor_de_estoque.nome_cadastro.pack(pady=20)
 
@@ -147,6 +147,14 @@ class App(ctk.CTk):
                 "Preencha todos os campos."
             )
             return
+        
+        if "@" not in nome or "." not in nome:
+            messagebox.showwarning(
+                "Atenção",
+                "Digite um e-mail válido."
+            )
+            return
+
 
         try:
             senha_hash = bcrypt.hashpw(senha.encode("utf-8"),bcrypt.gensalt()  ).decode("utf-8")
@@ -161,7 +169,7 @@ class App(ctk.CTk):
 
             messagebox.showinfo(
                 "Sucesso",
-                "Usuário cadastrado!"
+                "Email cadastrado!"
             )
 
             gestor_de_estoque.tela_login()
@@ -189,7 +197,7 @@ class App(ctk.CTk):
         gestor_de_estoque.nome_login = ctk.CTkEntry(
             gestor_de_estoque.frame_atual,
             width=300,
-            placeholder_text="Usuário"
+            placeholder_text="Email"
         )
         gestor_de_estoque.nome_login.pack(pady=20)
 
@@ -214,6 +222,8 @@ class App(ctk.CTk):
         ).pack(pady=20)
 
     def fazer_login(gestor_de_estoque):
+
+
 
         nome = gestor_de_estoque.nome_login.get()
         senha = gestor_de_estoque.senha_login.get()
@@ -242,6 +252,7 @@ class App(ctk.CTk):
 
         else:
             messagebox.showerror("Erro", "Usuário ou senha incorretos.")
+            
     def tela_estoque(gestor_de_estoque):
 
         gestor_de_estoque.limpar_tela()
@@ -847,8 +858,7 @@ class App(ctk.CTk):
         gestor_de_estoque.conexao.close()
 
         super().destroy()
-
-
+       
     def mostrar_grafico_vendas(gestor_de_estoque):
 
         gestor_de_estoque.cursor.execute("""
